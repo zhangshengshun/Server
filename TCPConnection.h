@@ -4,7 +4,7 @@
  * @Author: sueRimn
  * @Date: 2021-02-26 13:32:21
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-02-26 14:05:37
+ * @LastEditTime: 2021-02-26 15:46:02
  */
 #ifndef _TCPCONNECTION_H_
 #define _TCPCONNECTION_H_
@@ -24,7 +24,7 @@ struct MsgHeader{
     uint32_t legnth;//消息长度
     uint32_t recvfrom;//要发送给谁的ID
     uint32_t sendform;//自己的ID
-};
+}MsgHeader;
 
 typedef struct Iov{
     Iov(){
@@ -80,7 +80,7 @@ class TCPConnection{
     int enableReuseaddr( void );
     int sendPackage(int id);
 
-    int sockfd;//对应的文件描述符
+    //int sockfd;//对应的文件描述符
     //缓冲区
     std::list<Iov> m_sendIovList;
 

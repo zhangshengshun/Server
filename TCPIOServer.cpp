@@ -4,7 +4,7 @@
  * @Author: sueRimn
  * @Date: 2021-02-26 14:02:20
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-02-26 14:02:21
+ * @LastEditTime: 2021-02-26 15:52:36
  */
 #include"TCPIOServer.h"
 #include"Epoll.h"
@@ -63,7 +63,7 @@ void TCPIOServer::runInIOServer(){
     }
 }
 
-void TCPIOServer::startHadle(){
+void TCPIOServer::startHandle(){
     std::thread t(&TCPIOServer::Init,this);
     t.detach(); 
 }

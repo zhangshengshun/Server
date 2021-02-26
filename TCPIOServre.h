@@ -4,7 +4,7 @@
  * @Author: sueRimn
  * @Date: 2021-02-26 13:36:35
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-02-26 14:14:32
+ * @LastEditTime: 2021-02-26 15:52:26
  */
 #ifndef _TCPIOSERVER_H_
 #define _TCPIOSERVER_H_
@@ -15,7 +15,7 @@ class TCPIOServer{
     public:
     TCPIOServer():startID(0),stop(false){}
     void Init();
-    void startHadle();
+    void startHandle();
     void runInIOServer();
     
     Epoll *epollPtr;
