@@ -4,7 +4,7 @@
  * @Author: sueRimn
  * @Date: 2021-02-26 13:32:21
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-02-26 13:57:11
+ * @LastEditTime: 2021-02-26 14:05:37
  */
 #ifndef _TCPCONNECTION_H_
 #define _TCPCONNECTION_H_
@@ -57,7 +57,7 @@ struct InReq
 class Epoll;
 class TCPIOServer;
 class TCPConnection{
-    TCPConnection(Epoll *epollInIOServer);
+    TCPConnection(Epoll *epollInServer);
     TCPConnection(TCPIOServer *,Epoll *);
     ~connectfd();
 
