@@ -4,7 +4,7 @@
  * @Author: sueRimn
  * @Date: 2021-01-30 11:04:42
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-02-02 10:35:08
+ * @LastEditTime: 2021-02-26 14:02:37
  */
 
 #ifndef __EPOLL__
@@ -20,11 +20,9 @@ using namespace std;
 
 class Server;
 class client;
-class Epoll:public Singleton<Epoll>
+class Epoll
 {
 public:
-    friend class Singleton<Epoll>;
-
     Epoll();
     ~Epoll( void );
     int getEpollFd()const;
@@ -32,8 +30,6 @@ public:
     int doEvent(EpollEvent*ptr,int fd, int op, unsigned int events );
     void run( Server& server);
     void runInClient();
-private:
-
     struct epoll_event*   m_epollEvents;
     int                   m_epollFd;
     int                   m_eventSize;

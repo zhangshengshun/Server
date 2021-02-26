@@ -4,7 +4,7 @@
  * @Author: sueRimn
  * @Date: 2021-02-26 13:32:21
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-02-26 13:36:21
+ * @LastEditTime: 2021-02-26 13:57:11
  */
 #ifndef _TCPCONNECTION_H_
 #define _TCPCONNECTION_H_
@@ -15,6 +15,7 @@
 #include<netinet/in.h>
 #include<sys/uio.h>
 #include<cstring>
+#include"EpollEvent.h"
 
 const unsigned int HEADER_SIZE=4*sizeof(uint32_t);
 
@@ -53,8 +54,49 @@ struct InReq
     char* ioBuf;
 };
 
+class Epoll;
+class TCPIOServer;
 class TCPConnection{
-    connectfd();
+    TCPConnection(Epoll *epollInIOServer);
+    TCPConnection(TCPIOServer *,Epoll *);
+    ~connectfd();
+
+    void releaseSendBuffer();
+    void init();
+    int readData();
+    int sendData();
+    virtual int readTCP();
+    int readTCPHead();
+    int readTCPContent();
+    virtual int readBack();
+
+    int read( char* buf, size_t len );
+    int write( const char* buf, size_t len );
+    int close( void );
+    
+    int setNonblock( void );
+    int disableLinger( void );
+    int disableNagle( void );
+    int enableReuseaddr( void );
+    int sendPackage(int id);
+
+    int sockfd;//对应的文件描述符
+    //缓冲区
+    std::list<Iov> m_sendIovList;
+
+    uint32_t m_nReadOffset;//读取的偏移量
+    uint32_t m_nHeadSize;//头大小
+    uint32_t m_nContentLength;//数据内容的大小
+    
+    int m_connectionID;//ID
+    bool m_getReadHeader;//是否读头
+    bool m_getNewPackage;//是否是新的包
+
+    InReq m_InReq;
+    
+    //控制epoll中的fd
+    EpollEvent event;
+    TCPIOServer *server;
 };
 
 #endif

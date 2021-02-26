@@ -4,7 +4,7 @@
  * @Author: sueRimn
  * @Date: 2021-01-30 10:57:48
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-02-02 12:26:35
+ * @LastEditTime: 2021-02-26 13:49:53
  */
 
 #ifndef __EPOLLEVENT__
@@ -34,10 +34,14 @@ typedef struct event_st
     }
 } event_st;
 
+class Epoll;
 class EpollEvent
 {
 public:
     EpollEvent(){
+    }
+    EpollEvent(Epoll *epollPtr_){
+        epollPtr=epollPtr_;
     }
     ~EpollEvent( void )
     {
@@ -52,6 +56,8 @@ public:
     int registerRWEvents( void );
     int unregisterRWEvents( void );
     event_st m_epollEvent;
+
+    Epoll *epollPtr;
 };
 
 #endif
