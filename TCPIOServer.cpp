@@ -9,7 +9,7 @@
 #include"TCPIOServer.h"
 #include"Epoll.h"
 #include"EpollEvent.h"
-#include"TCPCOnnection"
+#include"TCPConnection.h"
 #include<thread>
 
 using std::cout;
@@ -57,7 +57,7 @@ void TCPIOServer::runInIOServer(){
                 connect->m_InReq.ioBuf=nullptr;
             }
             memset(&connect->m_InReq.m_msgHeader,0,HEADER_SIZE);
-            connect->server->fdMap.erase(event->m_epollEvent.m_id);
+            connect->server->connectManager.erase(event->m_epollEvent.m_id);
             continue;
         }
     }

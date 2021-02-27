@@ -11,6 +11,14 @@
 #include"Epoll.h"
 #include"TCPIOServer.h"
 
+#include<iostream>
+#include<limits.h>
+#include<unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/tcp.h>
+
 TCPConnection::TCPConnection(Epoll *epollInServer):event(epollInServer){
     m_getNewPackage=true;
     m_getReadHeader=false;
@@ -33,7 +41,7 @@ TCPConnection::TCPConnection(TCPIOServer* IOServer,Epoll* epollPtr):event(epollP
     server=IOServer;
 }
 
-int TCPconnection::readData(){
+int TCPConnection::readData(){
     
     if(this->readTCP()<0){
         return FAILED;
@@ -41,9 +49,9 @@ int TCPconnection::readData(){
     return SUCCESSFUL;
 }
 
-int TCPconnection::sendData(){
+int TCPConnection::sendData(){
     int iovcnt = m_sendIovList.size();
-    if(iovcnt>IOV_MAX){
+    if(iovcnt > IOV_MAX){
         iovcnt=IOV_MAX;
     }
     struct iovec* pIovec=new struct iovec[iovcnt];
@@ -101,7 +109,7 @@ int TCPconnection::sendData(){
     return rt;
 }
 
-int TCPconnection::readTCP(){
+int TCPConnection::readTCP(){
     if(m_getNewPackage){
         m_getNewPackage=false;
         m_getReadHeader=true;
@@ -135,7 +143,7 @@ int TCPconnection::readTCP(){
     return SUCCESSFUL;
 }
 
-int TCPconnection::readTCPHead(){
+int TCPConnection::readTCPHead(){
     
     int rt=this->read((char*)( &(m_InReq.m_msgHeader))+m_nReadOffset,m_nHeadSize-m_nReadOffset);
     
@@ -164,7 +172,7 @@ int TCPconnection::readTCPHead(){
     return SUCCESSFUL;
 }
 
-int TCPconnection::readTCPContent(){
+int TCPConnection::readTCPContent(){
     int rt=this->read(m_InReq.ioBuf+m_nReadOffset,m_nContentLength-m_nReadOffset);
     if(rt<=0){
         return FAILED;
@@ -182,15 +190,15 @@ int TCPconnection::readTCPContent(){
     return SUCCESSFUL;
 }
 
-int TCPconnection::readBack(){
-    TCPconnection* connect=nullptr;
+int TCPConnection::readBack(){
+    TCPConnection* connect=nullptr;
     //cout<<server->fdMap.size()<<endl;
-    if(this->m_InReq.m_msgHeader.sendform==this->server->fdMap.size()){
+    if(this->m_InReq.m_msgHeader.sendform==this->server->connectManager.size()){
         
-        connect=server->fdMap[1];
+        connect=server->connectManager[1];
     }
     else{
-        connect=server->fdMap[m_InReq.m_msgHeader.sendform];
+        connect=server->connectManager[m_InReq.m_msgHeader.sendform];
     }
     
     InReq reqSerevr;
@@ -216,17 +224,17 @@ int TCPconnection::readBack(){
     return SUCCESSFUL;
 }
 
-int TCPconnection::read(char* buf, size_t len){
+int TCPConnection::read(char* buf, size_t len){
     int readNum=::read(sockfd,buf,len);
     return readNum;
 }
 
-int TCPconnection::write(const char* buf, size_t len){
+int TCPConnection::write(const char* buf, size_t len){
     int writeNum=::write(sockfd,buf,len);
     return writeNum;
 }
 
-int TCPconnection::close(void){
+int TCPConnection::close(void){
     if(sockfd==-1){
         return SUCCESSFUL;
     }
@@ -238,7 +246,7 @@ int TCPconnection::close(void){
     return SUCCESSFUL;
 }
 
-int TCPconnection::setNonblock(void){
+int TCPConnection::setNonblock(void){
     int val;
     if((val=fcntl(sockfd,F_GETFL,0))<0){
         cout<<"TCPSocket::setNonBlock::fcntl-F_GETFL"<<endl;
@@ -252,7 +260,7 @@ int TCPconnection::setNonblock(void){
     return SUCCESSFUL;
 }
 
-int TCPconnection::disableLinger(){
+int TCPConnection::disableLinger(){
     int val=1;
     struct linger ling = {0, 0};
     if(setsockopt( sockfd,SOL_SOCKET, SO_LINGER, &ling, sizeof( ling ) ) < 0 ){
@@ -261,7 +269,7 @@ int TCPconnection::disableLinger(){
     return SUCCESSFUL;
 }
 
-int TCPconnection::disableNagle(){
+int TCPConnection::disableNagle(){
     int val = 1;
     if ( setsockopt( 
         sockfd, 
@@ -276,7 +284,7 @@ int TCPconnection::disableNagle(){
     return SUCCESSFUL;
 }
 
-int TCPconnection::enableReuseaddr(){
+int TCPConnection::enableReuseaddr(){
     int val = 1;
     if ( setsockopt( 
         sockfd, 

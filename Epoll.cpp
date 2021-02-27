@@ -4,9 +4,7 @@
 
 #include"Epoll.h"
 #include"EpollEvent.h"
-#include"server.h"
 #include"Error.h"
-#include"client.h"
 
 #define EPOLL_TIMEOUT_LEN 5
 

@@ -24,7 +24,7 @@ int EpollEvent::closeRevent( void ){
     }
     m_epollEvent.read=false;
     m_epollEvent.events=m_epollEvent.events&~LEVELREVENT;
-    if((Epoll::getInstance())->doEvent(this,m_epollEvent.fd,EVENTCHANGE, m_epollEvent.events)<0){       
+    if(epollPtr->doEvent(this,m_epollEvent.fd,EVENTCHANGE, m_epollEvent.events)<0){       
         return FAILED; 
     }
     
@@ -37,7 +37,7 @@ int EpollEvent::closeWevent( void ){
     }
     m_epollEvent.events=m_epollEvent.events&~LEVELWEVENT;
     m_epollEvent.write=false;
-    if((Epoll::getInstance())->doEvent(this,m_epollEvent.fd,EVENTCHANGE,m_epollEvent.events)<0){
+    if(epollPtr->doEvent(this,m_epollEvent.fd,EVENTCHANGE,m_epollEvent.events)<0){
         return FAILED;
     }
     
@@ -55,7 +55,7 @@ int EpollEvent::openWevent( void )
         m_epollEvent.write=true;
         m_epollEvent.events = m_epollEvent.events | LEVELWEVENT;
 
-        if ( (Epoll::getInstance())->doEvent(this,m_epollEvent.fd,EVENTCHANGE,m_epollEvent.events) < 0 )
+        if ( epollPtr->doEvent(this,m_epollEvent.fd,EVENTCHANGE,m_epollEvent.events) < 0 )
         {
             return FAILED;
         }
@@ -70,7 +70,7 @@ int EpollEvent::openRevent(){
     }
     m_epollEvent.events = m_epollEvent.events | LEVELREVENT;
     m_epollEvent.read=true;
-    if ( (Epoll::getInstance())->doEvent(this, m_epollEvent.fd, \
+    if ( epollPtr->doEvent(this, m_epollEvent.fd, \
                         EVENTCHANGE, m_epollEvent.events ) < 0 )
     {
         return FAILED;
@@ -92,7 +92,7 @@ int EpollEvent::registerREvent( void )
     m_epollEvent.read=true;
     m_epollEvent.write=false;
     
-    if ( (Epoll::getInstance())->doEvent(this,m_epollEvent.fd,EVENTADD, m_epollEvent.events) < 0 )
+    if ( epollPtr->doEvent(this,m_epollEvent.fd,EVENTADD, m_epollEvent.events) < 0 )
     {
         return FAILED;
     }
@@ -111,7 +111,7 @@ int EpollEvent::registerWEvent( void )
     m_epollEvent.write=true;
     m_epollEvent.read=false;
 
-    if ( (Epoll::getInstance())->doEvent(this,m_epollEvent.fd,EVENTADD, m_epollEvent.events) < 0 )
+    if ( epollPtr->doEvent(this,m_epollEvent.fd,EVENTADD, m_epollEvent.events) < 0 )
     {
         return FAILED;
     }
@@ -129,7 +129,7 @@ int EpollEvent::registerRWEvents( void )
     m_epollEvent.write=true;
     m_epollEvent.read=true;
 
-    if ( (Epoll::getInstance())->doEvent(this,m_epollEvent.fd,EVENTADD, m_epollEvent.events) < 0 )
+    if ( epollPtr->doEvent(this,m_epollEvent.fd,EVENTADD, m_epollEvent.events) < 0 )
     {
         return FAILED;
     }
@@ -148,7 +148,7 @@ int EpollEvent::unregisterRWEvents( void )
     m_epollEvent.read=false;
     m_epollEvent.read=false;
 
-    if ((Epoll::getInstance())->doEvent(this,m_epollEvent.fd, \
+    if (epollPtr->doEvent(this,m_epollEvent.fd, \
                            EVENTDEL, m_epollEvent.events ) < 0 )
     {
         return FAILED;

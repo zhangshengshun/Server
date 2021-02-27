@@ -11,11 +11,7 @@
 #define __EPOLL__
 
 #include <sys/epoll.h>
-
 #include"EpollEvent.h"
-#include"server.h"
-#include"SingleTon.h"
-#include"Connectfd.h"
 using namespace std;
 
 class Server;

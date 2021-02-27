@@ -13,6 +13,15 @@
 #include"TCPConnection.h"
 #include"EpollEvent.h"
 
+#include<iostream>
+#include <sys/epoll.h>
+#include<map>
+#include<list>
+#include<netinet/in.h>
+#include<sys/uio.h>
+#include <unistd.h>
+#include<cstring>
+
 TCPServer::TCPServer():fdNum(0),IOServerNum(0){
 
 }
@@ -48,7 +57,7 @@ int TCPServer::listen(){
     epollPtr->initialize(1024);
 
     this->connection=new TCPConnection(epollPtr);
-    this->connection->event->m_epollEvent=epollevent;
+    this->connection->event.m_epollEvent=epollevent;
 
     this->connection->event.registerREvent();
     this->connection->sockfd=nListenSocket;
@@ -67,16 +76,16 @@ int TCPServer::distributeConnection(int fd,int num){
 
 
     //得到IOServer
-    TCPIOServer server=this->IOServer[num];
+    TCPIOServer* server=this->IOServer[num];
     server->epollPtr=epollPtr;
 
     TCPConnection* connection=new TCPConnection(server,epollPtr);
     event_st epollevent;
     epollevent.fd=fd;
-    epollevent.m_id=startID;
+    epollevent.m_id=server->startID;
     connection->event.m_epollEvent=epollevent;
     
-    server->connectManager[startID++]=connection;
+    server->connectManager[server->startID++]=connection;
 
     this->connection->event.registerREvent();
     this->connection->sockfd=fd;

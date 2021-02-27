@@ -9,6 +9,8 @@
 #ifndef _TCPSERVER_H_
 #define _TCPSERVER_H_
 
+#include<map>
+
 const int maxIOServerNum=3;
 
 class TCPIOServer;

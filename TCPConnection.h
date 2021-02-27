@@ -24,7 +24,7 @@ struct MsgHeader{
     uint32_t legnth;//消息长度
     uint32_t recvfrom;//要发送给谁的ID
     uint32_t sendform;//自己的ID
-}MsgHeader;
+};
 
 typedef struct Iov{
     Iov(){
@@ -57,9 +57,10 @@ struct InReq
 class Epoll;
 class TCPIOServer;
 class TCPConnection{
+    public:
     TCPConnection(Epoll *epollInServer);
     TCPConnection(TCPIOServer *,Epoll *);
-    ~connectfd();
+    ~TCPConnection();
 
     void releaseSendBuffer();
     void init();
@@ -80,7 +81,7 @@ class TCPConnection{
     int enableReuseaddr( void );
     int sendPackage(int id);
 
-    //int sockfd;//对应的文件描述符
+    int sockfd;//对应的文件描述符
     //缓冲区
     std::list<Iov> m_sendIovList;
 
