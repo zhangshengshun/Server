@@ -28,8 +28,6 @@ public:
     int getEpollFd()const;
     int initialize( int );
     int doEvent(EpollEvent*ptr,int fd, int op, unsigned int events );
-    void run( Server& server);
-    void runInClient();
     struct epoll_event*   m_epollEvents;
     int                   m_epollFd;
     int                   m_eventSize;
