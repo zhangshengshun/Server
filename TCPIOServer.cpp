@@ -37,15 +37,13 @@ void TCPIOServer::runInIOServer(){
             continue;
         }  
         else if(this->epollPtr->m_epollEvents[i].events & EPOLLOUT){
-
             if(connect->sendData()<=0){
                 connect->event.closeWevent();
             }
             continue;
         }
         else if(this->epollPtr->m_epollEvents[i].events & EPOLLIN){
-            if(connect->readData()<0){
-                
+            if(connect->readData()<0){   
             }
             continue;
         }

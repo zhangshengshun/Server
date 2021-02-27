@@ -53,10 +53,10 @@ int TCPServer::listen(){
     epollevent.fd=nListenSocket;
     
     //创建epoll
-    Epoll *epollPtr=new Epoll();
-    epollPtr->initialize(1024);
+    this->epollPtr=new Epoll();
+    this->epollPtr->initialize(1024);
 
-    this->connection=new TCPConnection(epollPtr);
+    this->connection=new TCPConnection(this->epollPtr);
     this->connection->event.m_epollEvent=epollevent;
 
     this->connection->event.registerREvent();
@@ -83,21 +83,23 @@ int TCPServer::distributeConnection(int fd,int num){
     server->epollPtr=epollPtr;
 
     TCPConnection* connection=new TCPConnection(server,epollPtr);
+
     event_st epollevent;
     epollevent.fd=fd;
     epollevent.m_id=server->startID;
+
     connection->event.m_epollEvent=epollevent;
     
     server->connectManager[server->startID++]=connection;
 
-    this->connection->event.registerREvent();
-    this->connection->sockfd=fd;
+    connection->event.registerREvent();
+    connection->sockfd=fd;
 
-    this->connection->disableLinger();
-    this->connection->enableReuseaddr();
-    this->connection->disableNagle();
+    connection->disableLinger();
+    connection->enableReuseaddr();
+    connection->disableNagle();
 
-    this->connection->sendPackage(epollevent.m_id);
+    connection->sendPackage(epollevent.m_id);
     
     server->startHandle();
     return SUCCESSFUL;
