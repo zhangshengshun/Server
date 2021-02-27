@@ -89,7 +89,7 @@ class TCPConnection{
     uint32_t m_nHeadSize;//头大小
     uint32_t m_nContentLength;//数据内容的大小
     
-    int m_connectionID;//ID
+    //int m_connectionID;//ID
     bool m_getReadHeader;//是否读头
     bool m_getNewPackage;//是否是新的包
 

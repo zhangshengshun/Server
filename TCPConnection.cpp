@@ -228,13 +228,13 @@ int TCPConnection::readTCPContent(){
 int TCPConnection::readBack(){
     TCPConnection* connect=nullptr;
     //cout<<server->fdMap.size()<<endl;
-    // if(this->m_InReq.m_msgHeader.sendform==this->server->connectManager.size()){
-    //     connect=server->connectManager[];
-    // }
-    // else{
-    //     connect=server->connectManager[m_InReq.m_msgHeader.sendform];
-    // }
-    connect=server->connectManager[m_InReq.m_msgHeader.sendform%this->server->connectManager.size()];
+    if(this->m_InReq.m_msgHeader.sendform==this->server->connectManager.size()){
+        connect=server->connectManager[0];
+    }
+    else{
+        connect=server->connectManager[m_InReq.m_msgHeader.sendform];
+    }
+    //connect=server->connectManager[m_InReq.m_msgHeader.sendform%this->server->connectManager.size()];
     InReq reqSerevr;
     reqSerevr.m_msgHeader.cmd=2;
     reqSerevr.m_msgHeader.legnth=m_InReq.m_msgHeader.legnth;

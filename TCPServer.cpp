@@ -70,20 +70,17 @@ int TCPServer::listen(){
 }
 
 int TCPServer::distributeConnection(int fd,int num,bool IoStart){
-    //创建Epoll
-    if(IoStart){
-        Epoll *epollPtr=new Epoll();
-        epollPtr->initialize(1024);
-    }
-    
-
     //得到IOServer
     TCPIOServer* server=this->IOServer[num];
-    
     if(server==nullptr){
         return FAILED;
     }
-    server->epollPtr=epollPtr;
+    //创建Epoll
+    if(IoStart){
+        Epoll * epollPtr_=new Epoll();
+        epollPtr_->initialize(1024);
+        server->epollPtr=epollPtr_;
+    }
 
     TCPConnection* connection=new TCPConnection(server,server->epollPtr);
 
@@ -96,18 +93,16 @@ int TCPServer::distributeConnection(int fd,int num,bool IoStart){
 
     //cout<<"startID:"<<server->startID<<endl;
     
-    server->connectManager[server->startID++]=connection;
-
-    connection->event.registerREvent();
-    
+    server->connectManager[server->startID]=connection;
+    server->startID++;
 
     connection->disableLinger();
     connection->enableReuseaddr();
     connection->disableNagle();
 
+
+    connection->event.registerREvent();
     connection->sendPackage(epollevent.m_id);
-
-
     
     //得修改
     if(IoStart){
@@ -129,6 +124,7 @@ int TCPServer::accept(){
     
     if(IOServerNum<maxIOServerNum){
         TCPIOServer *server=new TCPIOServer();
+        //server->IoID=fdNum%maxIOServerNum;
         this->IOServer[fdNum%maxIOServerNum]=server;
         this->distributeConnection(clientfd,fdNum%maxIOServerNum,true);
         

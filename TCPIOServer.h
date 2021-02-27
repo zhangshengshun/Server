@@ -20,6 +20,9 @@ class TCPIOServer{
     
     Epoll *epollPtr;
     std::map<uint32_t,TCPConnection*> connectManager;
+    
+    //int IoID;
+
     int startID;
     bool stop;
     
