@@ -77,6 +77,9 @@ int TCPServer::distributeConnection(int fd,int num){
 
     //得到IOServer
     TCPIOServer* server=this->IOServer[num];
+    if(server==nullptr){
+        return FAILED;
+    }
     server->epollPtr=epollPtr;
 
     TCPConnection* connection=new TCPConnection(server,epollPtr);
@@ -103,12 +106,12 @@ int TCPServer::distributeConnection(int fd,int num){
 int TCPServer::accept(){
     sockaddr_in ClientAddress;
     socklen_t LengthOfClientAddress = sizeof(sockaddr_in);
-    int clientfd = ::accept(fd, (sockaddr *)&ClientAddress, &LengthOfClientAddress);
+    int clientfd = ::accept(nListenSocket, (sockaddr *)&ClientAddress, &LengthOfClientAddress);
     if(-1 == clientfd)
     {
         std::cout << "accept error" << std::endl;
         ::close(nListenSocket);
-        return 0;
+        return FAILED;
     }
 
     if(IOServerNum<maxIOServerNum){
@@ -122,6 +125,7 @@ int TCPServer::accept(){
         this->distributeConnection(clientfd,fdNum%maxIOServerNum);
         fdNum++;
     }
+    return SUCCESSFUL;
 }
 
 int TCPServer::runInServer(){
@@ -132,7 +136,7 @@ int TCPServer::runInServer(){
         for(int i=0;i<nfds;i++){
             event=(EpollEvent *)this->epollPtr->m_epollEvents[i].data.ptr;
             if(event->m_epollEvent.fd==this->nListenSocket){
-                server.accept();
+                this->accept();
                 continue;
             }
         }

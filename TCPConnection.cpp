@@ -41,6 +41,37 @@ TCPConnection::TCPConnection(TCPIOServer* IOServer,Epoll* epollPtr):event(epollP
     server=IOServer;
 }
 
+void TCPConnection::releaseSendBuffer(){
+    for(auto it=m_sendIovList.begin();it!=m_sendIovList.end();){
+        auto tempit = it;
+        ++it;
+        if(tempit->m_pCompleteBuffer!=nullptr){
+            delete[] tempit->m_pCompleteBuffer;
+            tempit->m_pCompleteBuffer=nullptr;
+        }
+        m_sendIovList.erase(tempit);
+    }
+}
+
+int TCPConnection::sendPackage(int id){
+    InReq m_inReq;
+    m_inReq.ioBuf=nullptr;
+    m_inReq.m_msgHeader.cmd=1;
+    m_inReq.m_msgHeader.legnth=0;
+    m_inReq.m_msgHeader.recvfrom=id;
+    m_inReq.m_msgHeader.sendform=0;
+
+    char *sendbuf=new char[HEADER_SIZE+1];
+    memset(sendbuf,0,HEADER_SIZE+1);
+    memcpy(sendbuf, &m_inReq.m_msgHeader, HEADER_SIZE);
+    m_sendIovList.push_back(Iov(sendbuf,HEADER_SIZE));
+
+    if(this->event.openWevent()<0){
+        return FAILED;
+    }
+    return SUCCESSFUL;
+}
+
 int TCPConnection::readData(){
     
     if(this->readTCP()<0){
