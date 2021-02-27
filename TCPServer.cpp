@@ -65,43 +65,54 @@ int TCPServer::listen(){
     this->connection->disableLinger();
     this->connection->enableReuseaddr();
     this->connection->disableNagle();
-
+    
     return SUCCESSFUL;
 }
 
-int TCPServer::distributeConnection(int fd,int num){
+int TCPServer::distributeConnection(int fd,int num,bool IoStart){
     //创建Epoll
-    Epoll *epollPtr=new Epoll();
-    epollPtr->initialize(1024);
-
+    if(IoStart){
+        Epoll *epollPtr=new Epoll();
+        epollPtr->initialize(1024);
+    }
+    
 
     //得到IOServer
     TCPIOServer* server=this->IOServer[num];
+    
     if(server==nullptr){
         return FAILED;
     }
     server->epollPtr=epollPtr;
 
-    TCPConnection* connection=new TCPConnection(server,epollPtr);
+    TCPConnection* connection=new TCPConnection(server,server->epollPtr);
 
     event_st epollevent;
     epollevent.fd=fd;
     epollevent.m_id=server->startID;
 
     connection->event.m_epollEvent=epollevent;
+    connection->sockfd=fd;
+
+    //cout<<"startID:"<<server->startID<<endl;
     
     server->connectManager[server->startID++]=connection;
 
     connection->event.registerREvent();
-    connection->sockfd=fd;
+    
 
     connection->disableLinger();
     connection->enableReuseaddr();
     connection->disableNagle();
 
     connection->sendPackage(epollevent.m_id);
+
+
     
-    server->startHandle();
+    //得修改
+    if(IoStart){
+        server->startHandle();
+    }
     return SUCCESSFUL;
 }
 
@@ -115,16 +126,17 @@ int TCPServer::accept(){
         ::close(nListenSocket);
         return FAILED;
     }
-
+    
     if(IOServerNum<maxIOServerNum){
         TCPIOServer *server=new TCPIOServer();
         this->IOServer[fdNum%maxIOServerNum]=server;
-        this->distributeConnection(clientfd,fdNum%maxIOServerNum);
+        this->distributeConnection(clientfd,fdNum%maxIOServerNum,true);
+        
         fdNum++;
         IOServerNum++;
     }
     else{
-        this->distributeConnection(clientfd,fdNum%maxIOServerNum);
+        this->distributeConnection(clientfd,fdNum%maxIOServerNum,false);
         fdNum++;
     }
     return SUCCESSFUL;

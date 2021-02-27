@@ -23,7 +23,7 @@ class TCPServer{
     void Init();
     int listen();
     int accept();
-    int distributeConnection(int ,int);
+    int distributeConnection(int ,int,bool);
     int runInServer();
     void start();
 

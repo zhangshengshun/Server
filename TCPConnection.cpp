@@ -69,6 +69,7 @@ int TCPConnection::sendPackage(int id){
     if(this->event.openWevent()<0){
         return FAILED;
     }
+    
     return SUCCESSFUL;
 }
 
@@ -155,9 +156,11 @@ int TCPConnection::readTCP(){
     }
     
     int rt;
+    
     //cout<<"cli==null"<<endl;
+    
     if(m_getReadHeader){
-        //cout<<"cli==null"<<endl;
+        
         rt=this->readTCPHead();
         if(rt<=0){
             return rt;
@@ -181,6 +184,7 @@ int TCPConnection::readTCPHead(){
     if(rt<=0){
         return FAILED;
     }
+    //cout<<"cli==null"<<endl;
     m_nReadOffset+=(uint32_t)rt;
     if(m_nReadOffset==m_nHeadSize){
         m_nReadOffset=0;
@@ -188,7 +192,7 @@ int TCPConnection::readTCPHead(){
         m_nContentLength=m_InReq.m_msgHeader.legnth;
         
         if(m_InReq.m_msgHeader.cmd==1&& m_InReq.m_msgHeader.legnth==0){
-            readBack();
+            this->readBack();
             delete[] m_InReq.ioBuf;
             m_getNewPackage = true;
         }
@@ -224,14 +228,13 @@ int TCPConnection::readTCPContent(){
 int TCPConnection::readBack(){
     TCPConnection* connect=nullptr;
     //cout<<server->fdMap.size()<<endl;
-    if(this->m_InReq.m_msgHeader.sendform==this->server->connectManager.size()){
-        
-        connect=server->connectManager[1];
-    }
-    else{
-        connect=server->connectManager[m_InReq.m_msgHeader.sendform];
-    }
-    
+    // if(this->m_InReq.m_msgHeader.sendform==this->server->connectManager.size()){
+    //     connect=server->connectManager[];
+    // }
+    // else{
+    //     connect=server->connectManager[m_InReq.m_msgHeader.sendform];
+    // }
+    connect=server->connectManager[m_InReq.m_msgHeader.sendform%this->server->connectManager.size()];
     InReq reqSerevr;
     reqSerevr.m_msgHeader.cmd=2;
     reqSerevr.m_msgHeader.legnth=m_InReq.m_msgHeader.legnth;

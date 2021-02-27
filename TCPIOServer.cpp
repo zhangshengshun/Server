@@ -31,18 +31,21 @@ void TCPIOServer::runInIOServer(){
     nfds=::epoll_wait(this->epollPtr->m_epollFd, this->epollPtr->m_epollEvents, this->epollPtr->m_eventSize, -1);
     for(int i=0;i<nfds;i++){
         event=(EpollEvent *)this->epollPtr->m_epollEvents[i].data.ptr;
+        cout<<"event->m_epollEvent.m_id:"<<event->m_epollEvent.m_id<<endl;
         TCPConnection* connect=this->connectManager[event->m_epollEvent.m_id];
         if(connect==nullptr){
             cout<<"connect == NULL"<<endl;
             continue;
         }  
         else if(this->epollPtr->m_epollEvents[i].events & EPOLLOUT){
+            //cout<<"sendData()"<<endl;
             if(connect->sendData()<=0){
                 connect->event.closeWevent();
             }
             continue;
         }
         else if(this->epollPtr->m_epollEvents[i].events & EPOLLIN){
+            //cout<<"readData()"<<endl;
             if(connect->readData()<0){   
             }
             continue;
