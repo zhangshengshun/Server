@@ -11,7 +11,7 @@
 
 #include<map>
 
-const int maxIOServerNum=6;
+const int maxIOServerNum=3;
 
 class TCPIOServer;
 class TCPConnection;

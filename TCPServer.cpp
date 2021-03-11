@@ -62,9 +62,11 @@ int TCPServer::listen(){
     this->connection->event.registerREvent();
     this->connection->sockfd=nListenSocket;
 
+    
     this->connection->disableLinger();
     this->connection->enableReuseaddr();
     this->connection->disableNagle();
+    
     
     return SUCCESSFUL;
 }
@@ -96,6 +98,7 @@ int TCPServer::distributeConnection(int fd,int num,bool IoStart){
     server->connectManager[server->startID]=connection;
     server->startID++;
 
+    connection->setNonblock();
     connection->disableLinger();
     connection->enableReuseaddr();
     connection->disableNagle();
